@@ -1,6 +1,6 @@
 # Realtime Location Tracker Module
 
-**Realtime Location Tracker** is a Kotlin Android module that provides **offline-first location tracking and reliable remote sync**. The module is designed to be **reusable in any app**, handling all background logic, database storage, network-aware syncing, and cleanup automatically. The UI layer is optional and can be customized to show status or control tracking.
+**Realtime Location Tracker** is a Kotlin Android module that provides **offline-first location tracking and reliable remote sync**. The module is designed to be **reusable in any Android app**, handling all background logic, database storage, network-aware syncing, and cleanup automatically. The optional UI layer can be used to monitor status and control tracking.
 
 ---
 
@@ -8,73 +8,69 @@
 
 ### Core Module
 - **Background Location Collection**
-  - Collects device location every 5 seconds using a **foreground service**.
-  - Handles permissions (`ACCESS_FINE_LOCATION`, `ACCESS_BACKGROUND_LOCATION`).
+  - Collects device location every **5 seconds** using a **foreground service**.
+  - Handles location and notification permissions (`ACCESS_FINE_LOCATION`, `ACCESS_COARSE_LOCATION`, `ACCESS_BACKGROUND_LOCATION`, `POST_NOTIFICATIONS`).
 
 - **Offline-first Storage**
-  - Stores location entries in a **Room database**.
-  - Each entry marked as **pending sync** until successfully uploaded.
+  - Locations are saved in a **Room database** as a proof-of-concept single source of truth.
+  - Each entry is marked as **pending sync** until successfully uploaded to the remote server.
 
 - **Reliable Remote Sync**
-  - Syncs unsynced data automatically when the network is available.
-  - Marks entries as synced after successful POST to remote server.
+  - The **LocationSyncService** automatically syncs unsynced data when the network is available.
+  - After a successful POST request, entries are **marked as synced** in the database.
+  - Network awareness ensures that syncing is paused offline and resumes automatically online.
 
 - **Periodic Cleanup**
-  - WorkManager deletes already synced data every hour to save storage.
-
-- **Network Awareness**
-  - Pauses syncing when offline and resumes automatically when online.
+  - A **WorkManager** class deletes already synced entries from the database every **hour**, ensuring storage stays optimized.
 
 - **Cancellation-safe**
-  - Uses **coroutines** to ensure services stop cleanly and no memory leaks occur.
+  - Uses **coroutines** to handle background tasks safely.
+  - Properly handles cancellation to prevent memory leaks or duplicated work.
 
 ---
 
-### UI Layer (Optional)
+### Optional UI Layer
 - **Start/Stop Tracking Buttons**
-  - Control location tracking from the UI.
+  - Provides user control to start or stop location tracking.
 - **Unsynced Data Count**
-  - Shows the number of pending location entries in real-time.
+  - Displays the number of location entries pending sync.
 - **Offline/Online Indicator**
-  - Visual indicator of network connectivity.
+  - Shows current network connectivity status.
 
-> The UI is **optional**; the module works independently in the background.
+> The UI is **thin** and optional. The module works independently in the background.
 
 ---
 
 ## Architecture Overview
-```
-UI Layer
-|
-v
-+-------------------+
-| Location Module |
+
+```text
+UI Layer (Optional)
+      |
+      v
++---------------------------+
+| Location Module           |
 | (LocationTrackingManager) |
++---------------------------+
+      |
+      v
 +-------------------+
-|
-v
+| Service + Worker  |
+| (LocationSyncService + Cleanup Worker) |
 +-------------------+
-| Service + Worker |
-+-------------------+
-|
-v
+      |
+      v
 +-------------------+
 | LocationRepository|
 +-------------------+
-|
-v
+      |
+      v
 +-------------------+
-| Room Database |
+| Room Database     |
 +-------------------+
-|
-v
-+-------------------+
-| LocationSyncService|
-+-------------------+
-|
-v
+      |
+      v
 +---------------------+
-| Remote Server API |
+| Remote Server API   |
 +---------------------+
 ```
 
@@ -94,3 +90,26 @@ v
    - ACCESS_FINE_LOCATION
    - ACCESS_COARSE_LOCATION
    - POST_NOTIFICATIONS
+
+
+- **Endpoint:** `POST https://free.mockerapi.com/post` (replace with your actual server URL)  
+- **Headers:**  
+  ```http
+  Content-Type: application/json
+  ```
+
+
+  ## Assumptions and Limitations
+
+- **Location Services:** Requires UI layer to show the permission Dialog currently.
+
+- **Network Dependency:** Syncing requires network connectivity; offline entries remain in the local database until connectivity is restored.
+
+- **Cleanup Interval:** Fixed at 1 hour for deleting synced entries (customizable via WorkManager).
+
+- **Data Security:** Currently does not implement encryption; for production, use HTTPS + encrypted local storage.
+
+- **Battery Usage:** Frequent updates (every 5 seconds) may impact battery life. Adjust interval if needed.
+
+- **UI Layer:** Minimal and optional; the module is primarily backend-focused.
+
