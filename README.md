@@ -8,7 +8,7 @@
 
 ### Core Module
 - **Background Location Collection**
-  - Collects device location every **5 seconds** using a **foreground service**.
+  - Collects device location every **10 seconds** using a **foreground service**.
   - Handles location and notification permissions (`ACCESS_FINE_LOCATION`, `ACCESS_COARSE_LOCATION`, `ACCESS_BACKGROUND_LOCATION`, `POST_NOTIFICATIONS`).
 
 - **Offline-first Storage**
@@ -16,7 +16,7 @@
   - Each entry is marked as **pending sync** until successfully uploaded to the remote server.
 
 - **Reliable Remote Sync**
-  - The **LocationSyncService** automatically syncs unsynced data when the network is available.
+  - The **LocationSyncService** automatically syncs unsynced data when the network is available on every 2 minute interval.
   - After a successful POST request, entries are **marked as synced** in the database.
   - Network awareness ensures that syncing is paused offline and resumes automatically online.
 
