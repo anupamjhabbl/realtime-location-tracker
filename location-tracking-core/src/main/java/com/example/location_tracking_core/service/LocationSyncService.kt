@@ -60,7 +60,7 @@ class LocationSyncService : Service() {
                 } catch (e: CancellationException) {
                     throw e
                 } catch (e: Exception) {}
-                delay(10000)
+                delay(1000 * 60 * 2)
             }
         }
     }

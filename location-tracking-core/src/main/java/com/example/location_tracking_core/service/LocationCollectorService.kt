@@ -68,7 +68,7 @@ class LocationCollectorService() : Service() {
 
         val locationRequest = LocationRequest.Builder(
             Priority.PRIORITY_HIGH_ACCURACY,
-            5000L
+            10000L
         ).build()
 
         try {

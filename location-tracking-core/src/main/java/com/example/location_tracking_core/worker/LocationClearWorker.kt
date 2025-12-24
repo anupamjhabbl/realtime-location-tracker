@@ -31,13 +31,13 @@ class LocationClearWorker @AssistedInject constructor(
     }
 
     companion object {
-        const val TASK_TIMER_MINUTES = 1L
+        const val TASK_TIMER_MINUTES = 60L
         const val TASK_IDENTIFIER = "location_sync_worker"
 
         fun initWorker(context: Context) {
             val workManagerBuilder = PeriodicWorkRequestBuilder<LocationClearWorker>(
                 repeatInterval = TASK_TIMER_MINUTES,
-                repeatIntervalTimeUnit = TimeUnit.HOURS
+                repeatIntervalTimeUnit = TimeUnit.MINUTES
             ).setConstraints(
                 Constraints.Builder()
                     .setRequiredNetworkType(NetworkType.CONNECTED)
