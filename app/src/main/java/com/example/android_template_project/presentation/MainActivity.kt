@@ -68,8 +68,13 @@ class MainActivity : ComponentActivity() {
                 LOCATION_PERMISSION_REQUEST_CODE
             )
         } else {
-            locationTrackingManager.startSync()
+            startLocationModule()
         }
+    }
+
+    private fun startLocationModule() {
+        locationTrackingManager.startCleanUpWorker()
+        locationTrackingManager.startSync()
     }
 
     private fun askBackgroundLocationPermission() {
@@ -85,10 +90,10 @@ class MainActivity : ComponentActivity() {
                     BACKGROUND_LOCATION_REQUEST_CODE
                 )
             } else {
-                locationTrackingManager.startSync()
+                startLocationModule()
             }
         } else {
-            locationTrackingManager.startSync()
+            startLocationModule()
         }
     }
 
@@ -107,7 +112,7 @@ class MainActivity : ComponentActivity() {
             }
         } else if (requestCode == BACKGROUND_LOCATION_REQUEST_CODE) {
             if (grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
-                locationTrackingManager.startSync()
+                startLocationModule()
             } else {
                 Toast.makeText(this, R.string.permission_not_given, Toast.LENGTH_SHORT).show()
             }

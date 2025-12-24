@@ -37,10 +37,13 @@ class LocationTrackingManager(
     }
 
     fun startSync() {
+        LocationClearWorker.initWorker(appContext)
+    }
+
+    fun startCleanUpWorker() {
         if (LocationCollectorService.hasNotificationPermission(appContext)) {
             val intent = Intent(appContext, LocationSyncService::class.java)
             appContext.startService(intent)
         }
-        LocationClearWorker.initWorker(appContext)
     }
 }
